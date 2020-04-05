@@ -38,6 +38,9 @@ def main():
             header = header[0:-1]
             style = Style(align="right")
 
+        if header == '_':
+            header = ''
+
         styles.append(style)
         new_headers.append(header)
 
