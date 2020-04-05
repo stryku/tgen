@@ -5,6 +5,19 @@ from pytablewriter.style import Style
 import sys
 import pyperclip
 
+
+def split_line(line):
+    values = line.split('|') if '|' in line else line.split()
+    return [v.strip() for v in values]
+
+
+def add_empty_values(expected_size, values):
+    if len(values) < expected_size:
+        values += [''] * (expected_size - len(values))
+    
+    return values
+
+
 def main():
     content = ''
     if len(sys.argv) < 2:
@@ -14,8 +27,7 @@ def main():
             content = f.read()
 
     lines = content.splitlines()
-
-    lines = [line.split() for line in lines]
+    lines = [split_line(line) for line in lines]
 
     if len(lines) == 0:
         print('No content. Exiting.')
@@ -23,6 +35,7 @@ def main():
 
     headers = lines[0]
     values = lines[1:]
+    values = [add_empty_values(len(headers), v) for v in values]
 
     styles = []
     new_headers = []
