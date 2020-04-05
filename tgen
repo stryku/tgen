@@ -1,0 +1,57 @@
+#!/usr/bin/python3
+
+from pytablewriter import MarkdownTableWriter
+from pytablewriter.style import Style
+import sys
+import pyperclip
+
+def main():
+    content = ''
+    if len(sys.argv) < 2:
+        content = pyperclip.paste()
+    else:
+        with open(sys.argv[1], 'r') as f:
+            content = f.read()
+
+    lines = content.splitlines()
+
+    lines = [line.split() for line in lines]
+
+    if len(lines) == 0:
+        print('No content. Exiting.')
+        exit(0)
+
+    headers = lines[0]
+    values = lines[1:]
+
+    styles = []
+    new_headers = []
+    for header in headers:
+        style = Style()
+        if header[0] == ':' and header[-1] == ':':
+            style = Style(align="center")
+            header = header[1:-1]
+        elif header[0] == ':':
+            header = header[1:]
+            style = Style(align="left")
+        elif header[-1] == ':':
+            header = header[0:-1]
+            style = Style(align="right")
+
+        styles.append(style)
+        new_headers.append(header)
+
+    headers = new_headers
+
+    writer = MarkdownTableWriter()
+    writer.headers = headers
+    writer.value_matrix = values
+    writer.margin = 1
+    writer.column_styles = styles
+
+    print('Generated:\n{}'.format(writer.dumps()))
+    print('Content:\n{}\n'.format(content))
+    pyperclip.copy(writer.dumps())
+
+if __name__ == "__main__":
+    main()
